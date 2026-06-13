@@ -1,7 +1,6 @@
 @import "tailwindcss";
 
 :root {
-  /* Notion color tokens */
   --notion-bg: #FFFFFF;
   --notion-bg-secondary: #F7F6F3;
   --notion-bg-hover: #EFEFEF;
@@ -14,7 +13,6 @@
   --notion-text-placeholder: #C4C1BB;
   --notion-blue: #2383E2;
   --notion-blue-bg: #E7F3FF;
-  --notion-blue-text: #1A6FBF;
   --notion-red: #EB5757;
   --notion-red-bg: #FBE4E4;
   --notion-green: #0F7B6C;
@@ -23,10 +21,19 @@
   --notion-yellow-bg: #FBF3DB;
   --notion-gray: #9B9A97;
   --notion-gray-bg: #E3E2E0;
-  --notion-sidebar-width: 240px;
+
+  --background: #FFFFFF;
+  --foreground: #37352F;
 }
 
-* { box-sizing: border-box; }
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+}
+
+* {
+  box-sizing: border-box;
+}
 
 body {
   background: var(--notion-bg);
@@ -34,13 +41,11 @@ body {
   font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   font-size: 14px;
   line-height: 1.5;
+  font-weight: 400;
   -webkit-font-smoothing: antialiased;
 }
 
-.pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
-
-/* Notion-style focus rings */
-*:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--notion-blue);
+/* Safe area inset for mobile PWA */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }

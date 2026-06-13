@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Package, Plus, LayoutGrid, History, Home } from "lucide-react";
+import { Home, LayoutGrid, Plus, Package, History } from "lucide-react";
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: Home },
@@ -16,25 +16,62 @@ export function TopNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="hidden md:flex items-center gap-1 bg-slate-900 text-white px-6 py-3 sticky top-0 z-40">
-      <Link href="/" className="flex items-center gap-2 mr-6 font-semibold text-lg">
-        <Package className="h-5 w-5" />
-        Home Inventory
-      </Link>
-      <div className="flex items-center gap-1">
+    <nav
+      className="hidden md:flex flex-col h-full flex-shrink-0"
+      style={{
+        width: "240px",
+        background: "var(--notion-bg-secondary)",
+        borderRight: "1px solid var(--notion-border)",
+      }}
+    >
+      {/* App title */}
+      <div className="px-3 py-4" style={{ borderBottom: "1px solid var(--notion-border-light)" }}>
+        <Link
+          href="/"
+          className="block px-2 py-1"
+          style={{
+            fontSize: "16px",
+            fontWeight: 600,
+            color: "var(--notion-text)",
+            textDecoration: "none",
+          }}
+        >
+          Home Inventory
+        </Link>
+      </div>
+
+      {/* Nav items */}
+      <div className="flex-1 px-2 py-2 space-y-0.5">
         {navItems.map(({ href, label, icon: Icon }) => {
           const isActive = pathname === href || (href !== "/" && pathname.startsWith(href));
           return (
             <Link
               key={href}
               href={href}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm transition-colors ${
-                isActive
-                  ? "bg-white/20 text-white"
-                  : "text-slate-300 hover:bg-white/10 hover:text-white"
-              }`}
+              className="flex items-center gap-2 w-full px-2 transition-colors"
+              style={{
+                height: "28px",
+                borderRadius: "3px",
+                fontSize: "13px",
+                fontWeight: isActive ? 500 : 400,
+                color: isActive ? "var(--notion-text)" : "var(--notion-text-secondary)",
+                background: isActive ? "var(--notion-bg-hover)" : "transparent",
+                textDecoration: "none",
+              }}
+              onMouseEnter={(e) => {
+                if (!isActive) {
+                  (e.currentTarget as HTMLElement).style.background = "var(--notion-bg-hover)";
+                  (e.currentTarget as HTMLElement).style.color = "var(--notion-text)";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isActive) {
+                  (e.currentTarget as HTMLElement).style.background = "transparent";
+                  (e.currentTarget as HTMLElement).style.color = "var(--notion-text-secondary)";
+                }
+              }}
             >
-              <Icon className="h-4 w-4" />
+              <Icon className="flex-shrink-0" style={{ width: "14px", height: "14px" }} />
               {label}
             </Link>
           );

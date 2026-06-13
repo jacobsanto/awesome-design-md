@@ -2,8 +2,17 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn("rounded-[4px] border border-[#E9E8E4] bg-white", className)} {...props} />
+  ({ className, style, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn("bg-white", className)}
+      style={{
+        border: "1px solid var(--notion-border)",
+        borderRadius: "4px",
+        ...style,
+      }}
+      {...props}
+    />
   )
 );
 Card.displayName = "Card";
@@ -16,15 +25,25 @@ const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDiv
 CardHeader.displayName = "CardHeader";
 
 const CardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
-  ({ className, ...props }, ref) => (
-    <h3 ref={ref} className={cn("text-[13px] font-semibold text-[#37352F] leading-tight", className)} {...props} />
+  ({ className, style, ...props }, ref) => (
+    <h3
+      ref={ref}
+      className={cn("leading-none", className)}
+      style={{ fontSize: "16px", fontWeight: 600, color: "var(--notion-text)", ...style }}
+      {...props}
+    />
   )
 );
 CardTitle.displayName = "CardTitle";
 
 const CardDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
-  ({ className, ...props }, ref) => (
-    <p ref={ref} className={cn("text-[12px] text-[#9B9A97]", className)} {...props} />
+  ({ className, style, ...props }, ref) => (
+    <p
+      ref={ref}
+      className={cn(className)}
+      style={{ fontSize: "14px", color: "var(--notion-text-secondary)", ...style }}
+      {...props}
+    />
   )
 );
 CardDescription.displayName = "CardDescription";

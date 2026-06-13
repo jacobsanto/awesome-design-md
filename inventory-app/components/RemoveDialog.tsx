@@ -47,9 +47,9 @@ export function RemoveDialog({ item, onSuccess, children }: RemoveDialogProps) {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Remove "{item.name}"</DialogTitle>
+            <DialogTitle>Remove &ldquo;{item.name}&rdquo;</DialogTitle>
           </DialogHeader>
-          <div className="space-y-3 px-5 pb-3">
+          <div className="space-y-3" style={{ padding: "0 20px 12px" }}>
             <div>
               <Label className="mb-1 block">Quantity to remove (max {item.quantity} {item.unit})</Label>
               <Input type="number" min="0.1" max={item.quantity} step="0.1" value={qty} onChange={(e) => setQty(e.target.value)} />
@@ -69,9 +69,10 @@ export function RemoveDialog({ item, onSuccess, children }: RemoveDialogProps) {
           <DialogFooter>
             <Button variant="secondary" onClick={() => setOpen(false)}>Cancel</Button>
             <Button
+              variant="destructive"
               onClick={handleConfirm}
               disabled={saving || !qty || parseFloat(qty) > item.quantity}
-              className="bg-[#EB5757] hover:bg-[#d94f4f]"
+              style={{ background: "var(--notion-red-bg)", color: "var(--notion-red)", border: "none" }}
             >
               {saving ? "Removing…" : "Confirm Remove"}
             </Button>

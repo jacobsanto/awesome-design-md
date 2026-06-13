@@ -23,7 +23,9 @@ export default function AreasPage() {
     const a = await getAreas();
     setAreas(a);
     const map: Record<string, SubArea[]> = {};
-    for (const area of a) map[area.id] = await getSubAreas(area.id);
+    for (const area of a) {
+      map[area.id] = await getSubAreas(area.id);
+    }
     setSubAreaMap(map);
   };
 
@@ -32,31 +34,55 @@ export default function AreasPage() {
   const handleCreateArea = async () => {
     if (!newAreaName.trim()) return;
     await createArea(newAreaName.trim());
-    setNewAreaName(""); load();
+    setNewAreaName("");
+    load();
   };
+
   const handleRenameArea = async (id: string) => {
     if (!editAreaName.trim()) return;
     await renameArea(id, editAreaName.trim());
-    setEditingArea(null); load();
+    setEditingArea(null);
+    load();
   };
-  const handleDeleteArea = async (id: string) => { await deleteArea(id); load(); };
+
+  const handleDeleteArea = async (id: string) => {
+    await deleteArea(id);
+    load();
+  };
+
   const handleCreateSubArea = async (areaId: string) => {
     if (!newSubArea[areaId]?.trim()) return;
     await createSubArea(areaId, newSubArea[areaId].trim());
-    setNewSubArea((p) => ({ ...p, [areaId]: "" })); load();
+    setNewSubArea((prev) => ({ ...prev, [areaId]: "" }));
+    load();
   };
-  const handleRenameSub = async (id: string) => {
+
+  const handleRenameSub = async (id: string, areaId: string) => {
     if (!editSubName.trim()) return;
     await renameSubArea(id, editSubName.trim());
-    setEditingSub(null); load();
+    setEditingSub(null);
+    load();
   };
-  const handleDeleteSub = async (id: string) => { await deleteSubArea(id); load(); };
+
+  const handleDeleteSub = async (id: string) => {
+    await deleteSubArea(id);
+    load();
+  };
+
+  const toggleExpand = (id: string) => {
+    setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
 
   return (
-    <div className="max-w-[600px] space-y-6 pb-8">
+    <div className="space-y-6 pb-4">
+      {/* Page header */}
       <div>
-        <h1 className="text-[28px] font-bold text-[#37352F] tracking-tight">Areas</h1>
-        <p className="text-[13px] text-[#787774] mt-1">Manage your storage locations and sub-areas</p>
+        <h1 style={{ fontSize: "28px", fontWeight: 700, letterSpacing: "-0.02em", color: "var(--notion-text)" }}>
+          Areas & Sub-Areas
+        </h1>
+        <p style={{ fontSize: "14px", color: "var(--notion-text-secondary)", marginTop: "2px" }}>
+          Organize your storage locations
+        </p>
       </div>
 
       {/* Add area */}
@@ -64,115 +90,208 @@ export default function AreasPage() {
         <Input
           value={newAreaName}
           onChange={(e) => setNewAreaName(e.target.value)}
-          placeholder="New area (e.g. Kitchen)…"
+          placeholder="New area name (e.g. Kitchen)…"
           onKeyDown={(e) => e.key === "Enter" && handleCreateArea()}
         />
-        <Button onClick={handleCreateArea} disabled={!newAreaName.trim()} size="sm">
-          <Plus className="h-3.5 w-3.5 mr-1" /> Add Area
+        <Button onClick={handleCreateArea} disabled={!newAreaName.trim()}>
+          <Plus style={{ width: "14px", height: "14px" }} /> Add Area
         </Button>
       </div>
 
       {/* Area list */}
       {areas.length === 0 ? (
-        <p className="text-[13px] text-[#9B9A97] py-8 text-center">No areas yet. Add your first one above.</p>
+        <div className="text-center py-12" style={{ color: "var(--notion-text-tertiary)", fontSize: "14px" }}>
+          <p>No areas yet. Add your first area above.</p>
+        </div>
       ) : (
-        <div className="rounded-[4px] border border-[#E9E8E4] bg-white divide-y divide-[#F1F1EF]">
-          {areas.map((area) => {
+        <div
+          style={{
+            border: "1px solid var(--notion-border)",
+            borderRadius: "4px",
+            background: "var(--notion-bg)",
+            overflow: "hidden",
+          }}
+        >
+          {areas.map((area, areaIdx) => {
             const subs = subAreaMap[area.id] ?? [];
             const isExpanded = expanded[area.id];
             return (
-              <div key={area.id}>
+              <div
+                key={area.id}
+                style={{ borderBottom: areaIdx < areas.length - 1 ? "1px solid var(--notion-border-light)" : "none" }}
+              >
                 {/* Area row */}
-                <div className="flex items-center gap-1 px-3 h-9 hover:bg-[#F7F6F3] group transition-colors">
-                  <button onClick={() => setExpanded((p) => ({ ...p, [area.id]: !p[area.id] }))} className="text-[#9B9A97] hover:text-[#37352F] mr-0.5">
-                    {isExpanded ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
+                <div
+                  className="flex items-center gap-2 px-3 transition-colors"
+                  style={{ height: "36px" }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLElement).style.background = "var(--notion-bg-secondary)";
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLElement).style.background = "transparent";
+                  }}
+                >
+                  <button
+                    onClick={() => toggleExpand(area.id)}
+                    style={{ color: "var(--notion-text-tertiary)", flexShrink: 0 }}
+                  >
+                    {isExpanded
+                      ? <ChevronDown style={{ width: "14px", height: "14px" }} />
+                      : <ChevronRight style={{ width: "14px", height: "14px" }} />
+                    }
                   </button>
 
                   {editingArea === area.id ? (
                     <div className="flex gap-2 flex-1">
-                      <Input value={editAreaName} onChange={(e) => setEditAreaName(e.target.value)} className="h-6 text-[12px]" autoFocus onKeyDown={(e) => e.key === "Enter" && handleRenameArea(area.id)} />
+                      <Input
+                        value={editAreaName}
+                        onChange={(e) => setEditAreaName(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && handleRenameArea(area.id)}
+                        autoFocus
+                      />
                       <Button size="sm" onClick={() => handleRenameArea(area.id)}>Save</Button>
-                      <Button size="sm" variant="secondary" onClick={() => setEditingArea(null)}>Cancel</Button>
+                      <Button size="sm" variant="ghost" onClick={() => setEditingArea(null)}>Cancel</Button>
                     </div>
                   ) : (
-                    <>
-                      <span className="text-[13px] font-medium text-[#37352F] flex-1">{area.name}</span>
-                      <span className="text-[11px] text-[#9B9A97] mr-2">{subs.length} sub-area{subs.length !== 1 ? "s" : ""}</span>
-                      <div className="hidden group-hover:flex items-center gap-0.5">
-                        <button onClick={() => { setEditingArea(area.id); setEditAreaName(area.name); }} className="p-1 text-[#9B9A97] hover:text-[#37352F] rounded-[3px] hover:bg-[#EFEFEF]">
-                          <Pencil className="h-3 w-3" />
-                        </button>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <button className="p-1 text-[#9B9A97] hover:text-[#EB5757] rounded-[3px] hover:bg-[#FBE4E4]">
-                              <Trash2 className="h-3 w-3" />
-                            </button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Delete "{area.name}"?</AlertDialogTitle>
-                              <AlertDialogDescription>This deletes the area and all its sub-areas. Items will lose their area assignment.</AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => handleDeleteArea(area.id)}>Delete</AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
-                    </>
+                    <div className="flex items-center flex-1 gap-2 min-w-0">
+                      <span
+                        className="flex-1 truncate"
+                        style={{ fontSize: "13px", fontWeight: 500, color: "var(--notion-text)" }}
+                      >
+                        {area.name}
+                      </span>
+                      <span style={{ fontSize: "12px", color: "var(--notion-text-tertiary)", flexShrink: 0 }}>
+                        {subs.length} sub-area{subs.length !== 1 ? "s" : ""}
+                      </span>
+                      <button
+                        onClick={() => { setEditingArea(area.id); setEditAreaName(area.name); }}
+                        className="flex-shrink-0 p-1 transition-colors"
+                        style={{ color: "var(--notion-text-tertiary)", borderRadius: "3px" }}
+                        onMouseEnter={(e) => (e.currentTarget as HTMLElement).style.color = "var(--notion-text)"}
+                        onMouseLeave={(e) => (e.currentTarget as HTMLElement).style.color = "var(--notion-text-tertiary)"}
+                      >
+                        <Pencil style={{ width: "12px", height: "12px" }} />
+                      </button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <button
+                            className="flex-shrink-0 p-1 transition-colors"
+                            style={{ color: "var(--notion-text-tertiary)", borderRadius: "3px" }}
+                            onMouseEnter={(e) => (e.currentTarget as HTMLElement).style.color = "var(--notion-red)"}
+                            onMouseLeave={(e) => (e.currentTarget as HTMLElement).style.color = "var(--notion-text-tertiary)"}
+                          >
+                            <Trash2 style={{ width: "12px", height: "12px" }} />
+                          </button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete &ldquo;{area.name}&rdquo;?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This will delete the area and all its sub-areas. Items will not be deleted but will lose their area assignment.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDeleteArea(area.id)}
+                              style={{ background: "var(--notion-red)", color: "white" }}
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
                   )}
                 </div>
 
                 {/* Sub-areas */}
                 {isExpanded && (
-                  <div className="bg-[#FAFAF9] divide-y divide-[#F1F1EF]">
+                  <div style={{ borderTop: "1px solid var(--notion-border-light)", background: "var(--notion-bg-secondary)" }}>
                     {subs.map((sub) => (
-                      <div key={sub.id} className="flex items-center gap-1 pl-8 pr-3 h-8 hover:bg-[#F7F6F3] group transition-colors">
+                      <div
+                        key={sub.id}
+                        className="flex items-center gap-2 pl-8 pr-3 transition-colors"
+                        style={{
+                          height: "32px",
+                          borderBottom: "1px solid var(--notion-border-light)",
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget as HTMLElement).style.background = "var(--notion-bg-hover)"}
+                        onMouseLeave={(e) => (e.currentTarget as HTMLElement).style.background = "transparent"}
+                      >
                         {editingSub === sub.id ? (
                           <div className="flex gap-2 flex-1">
-                            <Input value={editSubName} onChange={(e) => setEditSubName(e.target.value)} className="h-6 text-[12px]" autoFocus onKeyDown={(e) => e.key === "Enter" && handleRenameSub(sub.id)} />
-                            <Button size="sm" onClick={() => handleRenameSub(sub.id)}>Save</Button>
-                            <Button size="sm" variant="secondary" onClick={() => setEditingSub(null)}>Cancel</Button>
+                            <Input
+                              value={editSubName}
+                              onChange={(e) => setEditSubName(e.target.value)}
+                              autoFocus
+                              onKeyDown={(e) => e.key === "Enter" && handleRenameSub(sub.id, area.id)}
+                            />
+                            <Button size="sm" onClick={() => handleRenameSub(sub.id, area.id)}>Save</Button>
+                            <Button size="sm" variant="ghost" onClick={() => setEditingSub(null)}>Cancel</Button>
                           </div>
                         ) : (
                           <>
-                            <span className="text-[12px] text-[#787774] flex-1">{sub.name}</span>
-                            <div className="hidden group-hover:flex items-center gap-0.5">
-                              <button onClick={() => { setEditingSub(sub.id); setEditSubName(sub.name); }} className="p-1 text-[#9B9A97] hover:text-[#37352F] rounded-[3px] hover:bg-[#EFEFEF]">
-                                <Pencil className="h-2.5 w-2.5" />
-                              </button>
-                              <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                  <button className="p-1 text-[#9B9A97] hover:text-[#EB5757] rounded-[3px] hover:bg-[#FBE4E4]"><Trash2 className="h-2.5 w-2.5" /></button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>Delete "{sub.name}"?</AlertDialogTitle>
-                                    <AlertDialogDescription>Items in this sub-area will lose their sub-area assignment.</AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction onClick={() => handleDeleteSub(sub.id)}>Delete</AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
-                            </div>
+                            <span className="flex-1 truncate" style={{ fontSize: "13px", color: "var(--notion-text-secondary)" }}>
+                              {sub.name}
+                            </span>
+                            <button
+                              onClick={() => { setEditingSub(sub.id); setEditSubName(sub.name); }}
+                              className="p-1 flex-shrink-0"
+                              style={{ color: "var(--notion-text-tertiary)" }}
+                              onMouseEnter={(e) => (e.currentTarget as HTMLElement).style.color = "var(--notion-text)"}
+                              onMouseLeave={(e) => (e.currentTarget as HTMLElement).style.color = "var(--notion-text-tertiary)"}
+                            >
+                              <Pencil style={{ width: "11px", height: "11px" }} />
+                            </button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <button
+                                  className="p-1 flex-shrink-0"
+                                  style={{ color: "var(--notion-text-tertiary)" }}
+                                  onMouseEnter={(e) => (e.currentTarget as HTMLElement).style.color = "var(--notion-red)"}
+                                  onMouseLeave={(e) => (e.currentTarget as HTMLElement).style.color = "var(--notion-text-tertiary)"}
+                                >
+                                  <Trash2 style={{ width: "11px", height: "11px" }} />
+                                </button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Delete &ldquo;{sub.name}&rdquo;?</AlertDialogTitle>
+                                  <AlertDialogDescription>Items in this sub-area will lose their sub-area assignment.</AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => handleDeleteSub(sub.id)}
+                                    style={{ background: "var(--notion-red)", color: "white" }}
+                                  >
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
                           </>
                         )}
                       </div>
                     ))}
-                    {/* Add sub-area row */}
+
+                    {/* Add sub-area */}
                     <div className="flex gap-2 pl-8 pr-3 py-2">
                       <Input
                         value={newSubArea[area.id] ?? ""}
-                        onChange={(e) => setNewSubArea((p) => ({ ...p, [area.id]: e.target.value }))}
+                        onChange={(e) => setNewSubArea((prev) => ({ ...prev, [area.id]: e.target.value }))}
                         placeholder="Add sub-area…"
-                        className="text-[12px]"
                         onKeyDown={(e) => e.key === "Enter" && handleCreateSubArea(area.id)}
                       />
-                      <Button size="sm" variant="secondary" onClick={() => handleCreateSubArea(area.id)} disabled={!newSubArea[area.id]?.trim()}>
-                        <Plus className="h-3 w-3" />
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => handleCreateSubArea(area.id)}
+                        disabled={!newSubArea[area.id]?.trim()}
+                        style={{ border: "1px solid var(--notion-border)", flexShrink: 0 }}
+                      >
+                        <Plus style={{ width: "12px", height: "12px" }} />
                       </Button>
                     </div>
                   </div>

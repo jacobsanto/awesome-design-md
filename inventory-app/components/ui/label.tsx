@@ -5,10 +5,16 @@ import { cn } from "@/lib/utils";
 const Label = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
->(({ className, ...props }, ref) => (
+>(({ className, style, ...props }, ref) => (
   <LabelPrimitive.Root
     ref={ref}
-    className={cn("text-[12px] font-medium text-[#787774] leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70", className)}
+    className={cn("leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 mb-1 block", className)}
+    style={{
+      fontSize: "12px",
+      fontWeight: 500,
+      color: "var(--notion-text-secondary)",
+      ...style,
+    }}
     {...props}
   />
 ));

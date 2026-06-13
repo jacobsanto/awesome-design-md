@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Package } from "lucide-react";
+import { Package, Minus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { Item } from "@/lib/supabase/types";
 import { RemoveDialog } from "@/components/RemoveDialog";
@@ -11,8 +11,8 @@ interface ItemCardProps {
   onUpdate: () => void;
 }
 
-const conditionVariant = {
-  new:  "success",
+const conditionColor = {
+  new: "success",
   good: "secondary",
   fair: "warning",
   poor: "destructive",
@@ -21,14 +21,20 @@ const conditionVariant = {
 export function ItemCard({ item, onUpdate }: ItemCardProps) {
   return (
     <div
-      className="bg-white rounded-[4px] overflow-hidden flex flex-col transition-colors duration-100 group"
-      style={{ border: "1px solid #E9E8E4" }}
-      onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#C4C1BB")}
-      onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#E9E8E4")}
+      className="bg-white overflow-hidden group transition-colors"
+      style={{
+        border: "1px solid var(--notion-border)",
+        borderRadius: "4px",
+      }}
+      onMouseEnter={(e) => {
+        (e.currentTarget as HTMLElement).style.borderColor = "var(--notion-text-placeholder)";
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLElement).style.borderColor = "var(--notion-border)";
+      }}
     >
-      <Link href={`/item/${item.id}`} className="flex-1">
-        {/* Image */}
-        <div className="aspect-square bg-[#F7F6F3] relative overflow-hidden">
+      <Link href={`/item/${item.id}`}>
+        <div className="aspect-square relative overflow-hidden" style={{ background: "var(--notion-bg-secondary)" }}>
           {item.photo_url ? (
             <img
               src={item.photo_url}
@@ -37,31 +43,54 @@ export function ItemCard({ item, onUpdate }: ItemCardProps) {
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <Package className="h-8 w-8 text-[#C4C1BB]" />
+              <Package style={{ width: "32px", height: "32px", color: "var(--notion-border)" }} />
             </div>
           )}
-          <div className="absolute top-1.5 left-1.5">
-            <Badge variant={conditionVariant[item.condition]}>
+          <div className="absolute top-1.5 right-1.5">
+            <Badge variant={conditionColor[item.condition]}>
               {item.condition}
             </Badge>
           </div>
         </div>
-        {/* Text */}
-        <div className="px-2.5 py-2">
-          <p className="text-[13px] font-medium text-[#37352F] truncate leading-snug">{item.name}</p>
+        <div style={{ padding: "10px 12px" }}>
+          <p
+            className="truncate leading-tight"
+            style={{ fontSize: "13px", fontWeight: 500, color: "var(--notion-text)" }}
+          >
+            {item.name}
+          </p>
           {item.area && (
-            <p className="text-[11px] text-[#9B9A97] mt-0.5 truncate">
-              {item.area.name}{item.sub_area ? ` / ${item.sub_area.name}` : ""}
+            <p className="truncate mt-0.5" style={{ fontSize: "12px", color: "var(--notion-text-tertiary)" }}>
+              {item.area.name}{item.sub_area ? ` › ${item.sub_area.name}` : ""}
             </p>
           )}
-          <p className="text-[11px] text-[#787774] mt-0.5">{item.quantity} {item.unit}</p>
+          <p className="mt-0.5" style={{ fontSize: "12px", color: "var(--notion-text-secondary)" }}>
+            {item.quantity} {item.unit}
+          </p>
         </div>
       </Link>
-      {/* Remove row */}
-      <div className="px-2.5 pb-2">
+      <div style={{ padding: "0 12px 10px" }}>
         <RemoveDialog item={item} onSuccess={onUpdate}>
-          <button className="w-full text-[11px] text-[#9B9A97] hover:text-[#EB5757] hover:bg-[#FBE4E4] py-1 rounded-[3px] transition-colors duration-100 text-center">
-            Remove
+          <button
+            className="w-full flex items-center justify-center gap-1 py-1 transition-colors"
+            style={{
+              fontSize: "12px",
+              color: "var(--notion-text-tertiary)",
+              border: "1px solid var(--notion-border-light)",
+              borderRadius: "3px",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.color = "var(--notion-red)";
+              (e.currentTarget as HTMLElement).style.background = "var(--notion-red-bg)";
+              (e.currentTarget as HTMLElement).style.borderColor = "var(--notion-red-bg)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.color = "var(--notion-text-tertiary)";
+              (e.currentTarget as HTMLElement).style.background = "transparent";
+              (e.currentTarget as HTMLElement).style.borderColor = "var(--notion-border-light)";
+            }}
+          >
+            <Minus style={{ width: "10px", height: "10px" }} /> Remove
           </button>
         </RemoveDialog>
       </div>
