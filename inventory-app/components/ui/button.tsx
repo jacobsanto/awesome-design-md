@@ -4,28 +4,30 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center gap-1.5 whitespace-nowrap text-[13px] font-medium transition-colors duration-100 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-40 cursor-pointer select-none",
   {
     variants: {
       variant: {
-        default: "bg-slate-900 text-white hover:bg-slate-800",
-        destructive: "bg-red-600 text-white hover:bg-red-700",
-        outline: "border border-slate-300 bg-white hover:bg-slate-50 text-slate-900",
-        secondary: "bg-slate-100 text-slate-900 hover:bg-slate-200",
-        ghost: "hover:bg-slate-100 text-slate-700",
-        link: "text-slate-900 underline-offset-4 hover:underline",
+        default:
+          "bg-[#2383E2] text-white hover:bg-[#1d74c9] rounded-[3px]",
+        secondary:
+          "bg-transparent text-[#37352F] hover:bg-[#EFEFEF] rounded-[3px]",
+        outline:
+          "bg-white text-[#37352F] border border-[#E9E8E4] hover:bg-[#F7F6F3] rounded-[3px]",
+        ghost:
+          "bg-transparent text-[#787774] hover:bg-[#F7F6F3] hover:text-[#37352F] rounded-[3px]",
+        destructive:
+          "bg-transparent text-[#EB5757] hover:bg-[#FBE4E4] rounded-[3px]",
+        link: "text-[#2383E2] underline-offset-2 hover:underline p-0 h-auto",
       },
       size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-8 rounded-md px-3 text-xs",
-        lg: "h-12 rounded-md px-8 text-base",
-        icon: "h-10 w-10",
+        default: "h-7 px-3 py-0",
+        sm: "h-6 px-2 text-[12px]",
+        lg: "h-8 px-4 text-[14px]",
+        icon: "h-7 w-7 p-0",
       },
     },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
+    defaultVariants: { variant: "default", size: "default" },
   }
 );
 
@@ -39,11 +41,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
     return (
-      <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
-        ref={ref}
-        {...props}
-      />
+      <Comp className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props} />
     );
   }
 );

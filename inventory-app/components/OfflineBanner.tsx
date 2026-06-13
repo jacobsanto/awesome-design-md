@@ -5,23 +5,18 @@ import { WifiOff, RefreshCw } from "lucide-react";
 
 export function OfflineBanner() {
   const { isOnline, isSyncing } = useSync();
-
   if (isOnline && !isSyncing) return null;
 
   return (
-    <div className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium ${
-      isOnline ? "bg-blue-600 text-white" : "bg-amber-500 text-white"
-    }`}>
+    <div
+      className={`flex items-center justify-center gap-2 px-4 py-1.5 text-[12px] font-medium border-b border-[#E9E8E4] ${
+        isOnline ? "bg-[#E7F3FF] text-[#1A6FBF]" : "bg-[#FBF3DB] text-[#DFAB01]"
+      }`}
+    >
       {isOnline ? (
-        <>
-          <RefreshCw className="h-4 w-4 animate-spin" />
-          Syncing…
-        </>
+        <><RefreshCw className="h-3.5 w-3.5 animate-spin" /> Syncing…</>
       ) : (
-        <>
-          <WifiOff className="h-4 w-4" />
-          You are offline — changes will sync when reconnected
-        </>
+        <><WifiOff className="h-3.5 w-3.5" /> Offline — changes will sync when reconnected</>
       )}
     </div>
   );

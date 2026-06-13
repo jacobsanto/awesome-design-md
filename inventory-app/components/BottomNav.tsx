@@ -2,44 +2,34 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutGrid, Plus, Package, History, Home } from "lucide-react";
+import { LayoutGrid, Plus, MapPin, History, Home } from "lucide-react";
 
 const navItems = [
-  { href: "/", label: "Home", icon: Home },
+  { href: "/",          label: "Home",      icon: Home },
   { href: "/inventory", label: "Inventory", icon: LayoutGrid },
-  { href: "/item/new", label: "Add", icon: Plus, highlight: true },
-  { href: "/areas", label: "Areas", icon: Package },
-  { href: "/history", label: "History", icon: History },
+  { href: "/item/new",  label: "Add",       icon: Plus },
+  { href: "/areas",     label: "Areas",     icon: MapPin },
+  { href: "/history",   label: "History",   icon: History },
 ];
 
 export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-200 pb-safe">
-      <div className="flex items-center justify-around">
-        {navItems.map(({ href, label, icon: Icon, highlight }) => {
+    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-[#E9E8E4] pb-safe">
+      <div className="flex items-stretch">
+        {navItems.map(({ href, label, icon: Icon }) => {
           const isActive = pathname === href || (href !== "/" && pathname.startsWith(href));
           return (
             <Link
               key={href}
               href={href}
-              className={`flex flex-col items-center gap-0.5 py-2 px-3 flex-1 text-xs transition-colors ${
-                highlight
-                  ? "text-slate-900"
-                  : isActive
-                  ? "text-slate-900"
-                  : "text-slate-400"
+              className={`flex flex-col items-center justify-center gap-0.5 flex-1 py-2 text-[10px] transition-colors duration-100 ${
+                isActive ? "text-[#37352F]" : "text-[#9B9A97]"
               }`}
             >
-              {highlight ? (
-                <span className="flex items-center justify-center h-10 w-10 rounded-full bg-slate-900 text-white -mt-5 shadow-lg">
-                  <Icon className="h-5 w-5" />
-                </span>
-              ) : (
-                <Icon className="h-5 w-5" />
-              )}
-              <span>{label}</span>
+              <Icon className={`h-5 w-5 ${isActive ? "text-[#37352F]" : "text-[#9B9A97]"}`} />
+              {label}
             </Link>
           );
         })}

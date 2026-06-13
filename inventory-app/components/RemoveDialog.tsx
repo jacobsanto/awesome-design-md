@@ -11,11 +11,11 @@ import { removeItemQuantity } from "@/lib/db/operations";
 import type { Item, RemovalReason } from "@/lib/supabase/types";
 
 const REASONS: { value: RemovalReason; label: string }[] = [
-  { value: "used", label: "Used up" },
-  { value: "discarded", label: "Discarded / thrown away" },
-  { value: "given away", label: "Given away" },
-  { value: "sold", label: "Sold" },
-  { value: "moved", label: "Moved elsewhere" },
+  { value: "used",        label: "Used up" },
+  { value: "discarded",   label: "Discarded / thrown away" },
+  { value: "given away",  label: "Given away" },
+  { value: "sold",        label: "Sold" },
+  { value: "moved",       label: "Moved elsewhere" },
 ];
 
 interface RemoveDialogProps {
@@ -37,64 +37,41 @@ export function RemoveDialog({ item, onSuccess, children }: RemoveDialogProps) {
     setSaving(true);
     try {
       await removeItemQuantity(item, q, reason, notes);
-      setOpen(false);
-      onSuccess();
-    } finally {
-      setSaving(false);
-    }
+      setOpen(false); onSuccess();
+    } finally { setSaving(false); }
   };
 
   return (
     <>
       <div onClick={() => setOpen(true)}>{children}</div>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-sm">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Remove "{item.name}"</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-2">
+          <div className="space-y-3 px-5 pb-3">
             <div>
-              <Label>Quantity to remove (max {item.quantity} {item.unit})</Label>
-              <Input
-                type="number"
-                min="0.1"
-                max={item.quantity}
-                step="0.1"
-                value={qty}
-                onChange={(e) => setQty(e.target.value)}
-                className="mt-1"
-              />
+              <Label className="mb-1 block">Quantity to remove (max {item.quantity} {item.unit})</Label>
+              <Input type="number" min="0.1" max={item.quantity} step="0.1" value={qty} onChange={(e) => setQty(e.target.value)} />
             </div>
             <div>
-              <Label>Reason</Label>
+              <Label className="mb-1 block">Reason</Label>
               <Select value={reason} onValueChange={(v) => setReason(v as RemovalReason)}>
-                <SelectTrigger className="mt-1">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {REASONS.map(({ value, label }) => (
-                    <SelectItem key={value} value={value}>{label}</SelectItem>
-                  ))}
-                </SelectContent>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>{REASONS.map(({ value, label }) => <SelectItem key={value} value={value}>{label}</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <div>
-              <Label>Notes (optional)</Label>
-              <Textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Any notes…"
-                className="mt-1"
-                rows={2}
-              />
+              <Label className="mb-1 block">Notes (optional)</Label>
+              <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Any notes…" rows={2} />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+            <Button variant="secondary" onClick={() => setOpen(false)}>Cancel</Button>
             <Button
-              variant="destructive"
               onClick={handleConfirm}
               disabled={saving || !qty || parseFloat(qty) > item.quantity}
+              className="bg-[#EB5757] hover:bg-[#d94f4f]"
             >
               {saving ? "Removing…" : "Confirm Remove"}
             </Button>
