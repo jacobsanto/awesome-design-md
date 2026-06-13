@@ -1,1 +1,4 @@
 .DS_Store
+inventory-app/.next
+inventory-app/node_modules
+inventory-app/.env.local
